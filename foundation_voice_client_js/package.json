@@ -1,5 +1,5 @@
 {
-  "name": "@think41/client-js-standalone",
+  "name": "@think41/foundation_voice_client_js",
   "version": "0.1.0",
   "description": "PipeCat Client JS SDK with Transport Layer",
   "main": "dist/index.js",
