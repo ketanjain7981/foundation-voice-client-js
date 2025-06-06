@@ -1,13 +1,13 @@
 {
-  "name": "@think41/foundation_voice_client_js",
+  "name": "@ketanjain7981/foundation_voice_client_js",
   "version": "0.1.0",
   "description": "PipeCat Client JS SDK with Transport Layer",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "type": "module",
   "publishConfig": {
-    "@think41:registry": "https://npm.pkg.github.com",
-    "access": "restricted"
+    "@ketanjain7981:registry": "https://npm.pkg.github.com",
+    "access": "public"
   },
   "repository": {
     "type": "git",

@@ -20,7 +20,7 @@ jobs:
         with:
           node-version: '18.x'
           registry-url: 'https://npm.pkg.github.com'
-          scope: '@think41'
+          scope: '@ketanjain7981'
       
       - name: List files in foundation_voice_client_js
         run: ls -la
