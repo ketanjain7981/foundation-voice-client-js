@@ -24,13 +24,16 @@ jobs:
       
       - name: Install dependencies
         run: npm ci
+        working-directory: ./foundation_voice_client_js
         env:
           NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
       
       - name: Build package
         run: npm run build
+        working-directory: ./foundation_voice_client_js
       
       - name: Publish to GitHub Packages
         run: npm publish
+        working-directory: ./foundation_voice_client_js
         env:
           NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
