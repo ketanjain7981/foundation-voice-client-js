@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voice Bot</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        
+        .voice-bot-container {
+            text-align: center;
+            color: white;
+            position: relative;
+        }
+        
+        .title {
+            font-size: 2.5rem;
+            font-weight: 300;
+            margin-bottom: 3rem;
+            opacity: 0.9;
+            letter-spacing: 2px;
+        }
+        
+        .voice-interface {
+            position: relative;
+            margin-bottom: 3rem;
+        }
+        
+        .voice-button {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            position: relative;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        
+        .voice-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+        }
+        
+        .voice-button.listening {
+            background: rgba(255, 82, 82, 0.2);
+            animation: pulse 2s infinite;
+        }
+        
+        .voice-button.connected {
+            background: rgba(76, 175, 80, 0.2);
+        }
+        
+        .voice-button.disconnected {
+            background: rgba(158, 158, 158, 0.2);
+        }
+        
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+                box-shadow: 0 0 0 0 rgba(255, 82, 82, 0.7);
+            }
+            70% {
+                transform: scale(1.05);
+                box-shadow: 0 0 0 20px rgba(255, 82, 82, 0);
+            }
+            100% {
+                transform: scale(1);
+                box-shadow: 0 0 0 0 rgba(255, 82, 82, 0);
+            }
+        }
+        
+        .mic-icon {
+            width: 60px;
+            height: 60px;
+            fill: currentColor;
+            opacity: 0.8;
+        }
+        
+        .status-text {
+            font-size: 1.2rem;
+            margin-top: 2rem;
+            opacity: 0.8;
+            font-weight: 300;
+        }
+        
+        .connection-controls {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 2rem;
+        }
+        
+        .control-button {
+            padding: 12px 24px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+        
+        .control-button:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.5);
+            transform: translateY(-2px);
+        }
+        
+        .control-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .control-button.primary {
+            background: rgba(76, 175, 80, 0.3);
+            border-color: rgba(76, 175, 80, 0.5);
+        }
+        
+        .control-button.danger {
+            background: rgba(244, 67, 54, 0.3);
+            border-color: rgba(244, 67, 54, 0.5);
+        }
+        
+        .audio-visualizer {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 220px;
+            height: 220px;
+            border-radius: 50%;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .audio-visualizer.active {
+            opacity: 1;
+            animation: rotate 20s linear infinite;
+        }
+        
+        @keyframes rotate {
+            from { transform: translate(-50%, -50%) rotate(0deg); }
+            to { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+        
+        .background-pattern {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.1;
+            background-image: radial-gradient(circle at 25% 25%, white 2px, transparent 2px),
+                              radial-gradient(circle at 75% 75%, white 2px, transparent 2px);
+            background-size: 50px 50px;
+            z-index: -1;
+        }
+        
+        .connection-indicator {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #f44336;
+            transition: all 0.3s ease;
+        }
+        
+        .connection-indicator.connected {
+            background: #4caf50;
+            box-shadow: 0 0 10px rgba(76, 175, 80, 0.5);
+        }
+    </style>
+</head>
+<body>
+    <div class="background-pattern"></div>
+    
+    <div class="voice-bot-container">
+        <h1 class="title">Voice Bot</h1>
+        
+        <div class="voice-interface">
+            <button class="voice-button disconnected" id="voice-button">
+                <svg class="mic-icon" viewBox="0 0 24 24">
+                    <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/>
+                    <path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/>
+                </svg>
+                <div class="connection-indicator" id="connection-indicator"></div>
+            </button>
+            <div class="audio-visualizer" id="audio-visualizer"></div>
+        </div>
+        
+        <div class="status-text" id="status-text">Click Connect to start</div>
+        
+        <div class="connection-controls">
+            <button class="control-button primary" id="connect-button">Connect</button>
+            <button class="control-button danger" id="disconnect-button" disabled>Disconnect</button>
+        </div>
+    </div>
+
+    <script type="module">
+        // Import the necessary modules from the SDK
+        import { LLMHelper, createRTVIClient } from '../../dist/index.js';
+
+        // DOM Elements
+        const voiceButton = document.getElementById('voice-button');
+        const connectButton = document.getElementById('connect-button');
+        const disconnectButton = document.getElementById('disconnect-button');
+        const statusText = document.getElementById('status-text');
+        const connectionIndicator = document.getElementById('connection-indicator');
+        const audioVisualizer = document.getElementById('audio-visualizer');
+
+
+        // State
+        let client = null;
+        let llmHelper = null;
+        let isConnected = false;
+        let isListening = false;
+
+       
+        // Update connection state
+        function setConnected(connected) {
+            isConnected = connected;
+            
+            voiceButton.className = `voice-button ${connected ? 'connected' : 'disconnected'}`;
+            connectionIndicator.className = `connection-indicator ${connected ? 'connected' : ''}`;
+            
+            connectButton.disabled = connected;
+            disconnectButton.disabled = !connected;
+            
+            if (!connected) {
+                setListening(false);
+            }
+        }
+
+        // Update listening state
+        function setListening(listening) {
+            isListening = listening;
+            
+            if (listening) {
+                voiceButton.classList.add('listening');
+                audioVisualizer.classList.add('active');
+                updateStatus('Listening...');
+            } else {
+                voiceButton.classList.remove('listening');
+                audioVisualizer.classList.remove('active');
+                if (isConnected) {
+                    updateStatus('Ready to listen');
+                }
+            }
+        }
+
+        // Update status text
+        function updateStatus(text) {
+            statusText.textContent = text;
+        }
+
+        // Connect to the server
+        connectButton.addEventListener('click', async () => {
+            try {
+                client = await createRTVIClient("websocket");
+                client.enableMic(true);
+                client.connect();
+                
+                // Set connected state if no event listeners worked
+                setTimeout(() => {
+                    if (!isConnected) {
+                        setConnected(true);
+                        updateStatus('Connected - Ready to listen');
+                    }
+                }, 1000);
+                
+            } catch (error) {
+                console.error('Connection error:', error);
+                updateStatus('Failed to connect - ' + error.message);
+                setConnected(false);
+            }
+        });
+
+        // Disconnect from the server
+        disconnectButton.addEventListener('click', () => {
+            if (client) {
+                client.disconnect();
+                setConnected(false);
+                client = null;
+                llmHelper = null;
+            }
+        });
+
+        // Handle voice button click
+        voiceButton.addEventListener('click', async () => {
+            if (!isConnected) {
+                updateStatus('Please connect first');
+                return;
+            }
+
+            if (isListening) {
+                // Stop listening
+                setListening(false);
+                try {
+                    if (client && client.stopVoice) {
+                        await client.stopVoice();
+                    }
+                } catch (error) {
+                    console.error('Error stopping voice:', error);
+                }
+            } else {
+                // Start listening
+                setListening(true);
+                try {
+                    if (client && client.startVoice) {
+                        await client.startVoice();
+                    } else if (client && client.sendTextMessage) {
+                        // Fallback: simulate voice interaction
+                        setTimeout(() => {
+                            setListening(false);
+                            updateStatus('Processing...');
+                        }, 3000);
+                    }
+                } catch (error) {
+                    console.error('Error starting voice:', error);
+                    setListening(false);
+                    updateStatus('Voice error: ' + error.message);
+                }
+            }
+        });
+
+        // Add keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.code === 'Space' && isConnected) {
+                e.preventDefault();
+                voiceButton.click();
+            }
+        });
+
+        // Initialize
+        updateStatus('Click Connect to start');
+    </script>
+</body>
+</html>

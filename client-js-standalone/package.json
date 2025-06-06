@@ -1,0 +1,43 @@
+{
+  "name": "@think41/client-js-standalone",
+  "version": "0.1.0",
+  "description": "PipeCat Client JS SDK with Transport Layer",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "type": "module",
+  "publishConfig": {
+    "@think41:registry": "https://npm.pkg.github.com",
+    "access": "restricted"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/think41/client-sdk.git"
+  },
+  "scripts": {
+    "build": "tsup index.ts --format esm --dts",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "pipecat",
+    "cai",
+    "typescript",
+    "sdk"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@pipecat-ai/client-js": "^0.3.5",
+    "@pipecat-ai/daily-transport": "^0.3.10",
+    "@pipecat-ai/small-webrtc-transport": "^0.0.5",
+    "@pipecat-ai/gemini-live-websocket-transport": "^0.3.5",
+    "@pipecat-ai/openai-realtime-webrtc-transport": "^0.3.6",
+    "protobufjs": "^7.5.2"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0",
+    "tsup": "^7.0.0"
+  },
+  "typescript": {
+    "tsconfig": "tsconfig.json"
+  }
+}

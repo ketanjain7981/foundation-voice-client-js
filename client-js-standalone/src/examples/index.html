@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PipeCat Client JS Demo</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .pipecat-widget {
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: 500px;
+        }
+        .pipecat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 15px;
+            background-color: #f9f9f9;
+        }
+        .pipecat-message {
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 8px;
+            max-width: 80%;
+        }
+        .pipecat-message-user {
+            background-color: #e3f2fd;
+            align-self: flex-end;
+            margin-left: auto;
+        }
+        .pipecat-message-assistant {
+            background-color: #f1f1f1;
+            align-self: flex-start;
+        }
+        .pipecat-input-form {
+            display: flex;
+            padding: 10px;
+            background-color: #fff;
+            border-top: 1px solid #eee;
+        }
+        .pipecat-input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-right: 10px;
+        }
+        .pipecat-submit-button {
+            padding: 10px 15px;
+            background-color: #2196F3;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .pipecat-submit-button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        .pipecat-empty-state {
+            text-align: center;
+            color: #888;
+            margin-top: 20px;
+        }
+        .pipecat-message-loading {
+            display: flex;
+            align-items: center;
+        }
+        .pipecat-loading-indicator {
+            display: inline-block;
+        }
+        .pipecat-status {
+            padding: 5px 10px;
+            background-color: #f1f1f1;
+            border-radius: 4px;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+        .pipecat-status.connected {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+        }
+        .pipecat-status.disconnected {
+            background-color: #ffebee;
+            color: #c62828;
+        }
+    </style>
+</head>
+<body>
+    <h1>PipeCat Client JS Demo</h1>
+
+    <div style="margin-top: 20px;">
+        <button id="connect-button">Connect</button>
+        <button id="disconnect-button">Disconnect</button>
+    </div>
+
+    <script type="module">
+        import {createRTVIClient } from '../../dist/index.js';
+
+        const connectButton = document.getElementById('connect-button');
+        const disconnectButton = document.getElementById('disconnect-button');
+
+        let client = null;
+        connectButton.addEventListener('click', async () => {
+            client = await createRTVIClient("websocket");
+            client.enableMic(true);
+            client.connect();
+        });
+        disconnectButton.addEventListener('click', () => {
+            if (client) {
+                client.disconnect();
+            }
+        });
+    </script>
+</body>
+</html>
